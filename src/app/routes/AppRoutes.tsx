@@ -3,6 +3,7 @@ import {useAuth} from '../../features/auth/context/AuthContext';
 import {LoginPage} from '../../features/auth/components/Login';
 import App from '../../App';
 import type {JSX} from "react";
+import {AdminDashboard} from "../../features/admin/components/AdminDashboard.tsx";
 
 const PrivateRoute = ({children}: { children: JSX.Element }) => {
     const {user} = useAuth();
@@ -25,6 +26,14 @@ export const AppRoutes = () => {
                     element={
                         <PrivateRoute>
                             <App/>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/admin"
+                    element={
+                        <PrivateRoute>
+                            <AdminDashboard/>
                         </PrivateRoute>
                     }
                 />
