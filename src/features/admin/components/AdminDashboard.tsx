@@ -5,6 +5,8 @@ import { useCategories } from '../../polls/hooks/useCategories';
 import { searchMovies } from '../api/tmdb';
 import { markWinner } from '../api/admin-actions';
 import { useQueryClient } from '@tanstack/react-query';
+import { addNomineeFromTMDB } from '../api/admin-actions';
+import { useMutation } from '@tanstack/react-query';
 
 export const AdminDashboard = () => {
     const { data: categories } = useCategories();
@@ -32,6 +34,16 @@ export const AdminDashboard = () => {
             message.error('Error al actualizar');
         }
     };
+
+    const addMutation = useMutation({
+        mutationFn: addNomineeFromTMDB,
+        onSuccess: () => {
+            message.success('Película agregada a la categoría');
+            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            setIsModalOpen(false);
+        },
+        onError: () => message.error('Error al agregar'),
+    });
 
     const columns = [
         { title: 'Categoría', dataIndex: 'name', key: 'name' },
@@ -94,7 +106,22 @@ export const AdminDashboard = () => {
                     dataSource={searchResults}
                     renderItem={(item) => (
                         <List.Item
-                            actions={[<Button type="link">Agregar</Button>]}
+                            actions={[
+                                <Button
+                                    type="primary"
+                                    loading={addMutation.isPending}
+                                    onClick={() => {
+                                        if (selectedCategory) {
+                                            addMutation.mutate({
+                                                categoryId: selectedCategory,
+                                                movie: item
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Agregar
+                                </Button>
+                            ]}
                         >
                             <List.Item.Meta
                                 avatar={<Avatar src={item.poster_path} shape="square" size={64} />}
