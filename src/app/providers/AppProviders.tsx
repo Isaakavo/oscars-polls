@@ -17,13 +17,13 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
             <ConfigProvider
                 theme={{
                     token: {
-                        colorPrimary: '#d4af37', // Gold Oscar
-                        borderRadius: 6,
+                        colorPrimary: '#d4af37',
+                        borderRadius: 0,
                         fontFamily: 'system-ui, -apple-system, sans-serif',
                     },
                     components: {
                         Layout: {
-                            headerBg: '#000000', // Header negro elegante
+                            headerBg: '#000000',
                         }
                     }
                 }}

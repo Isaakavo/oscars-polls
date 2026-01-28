@@ -32,3 +32,19 @@ export const castVote = async ({
     if (error) throw new Error(error.message);
     return data;
 };
+
+export const getAllVotes = async () => {
+    const {data, error} = await supabase
+        .from('votes')
+        .select(`
+      *,
+      profiles (
+        id,
+        full_name,
+        avatar_url
+      )
+    `);
+
+    if (error) throw new Error(error.message);
+    return data;
+};
