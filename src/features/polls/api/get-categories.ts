@@ -6,6 +6,7 @@ export interface Nominee {
     movie_title: string;
     poster_path: string;
     category_id: number;
+    is_winner: boolean;
 }
 
 export interface Category {

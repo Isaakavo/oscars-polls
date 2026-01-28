@@ -3,6 +3,7 @@ import {Tabs} from 'antd'; // Importar Tabs
 import {LiveDashboard} from './features/polls/components/LiveDashboard';
 import {CountdownTimer} from './components/ui/CountdownTimer';
 import {MovieCard} from "./features/polls/components/MovieCard.tsx";
+import {Leaderboard} from "./features/polls/components/Leaderboard.tsx";
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
@@ -46,6 +47,11 @@ function App() {
                             key: '2',
                             label: 'Tablero Global',
                             children: <LiveDashboard/>,
+                        },
+                        {
+                            key: '3',
+                            label: '🏆 Posiciones', // Nueva pestaña
+                            children: <Leaderboard />,
                         }
                     ]}
                 />
