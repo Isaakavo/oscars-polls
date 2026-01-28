@@ -4,6 +4,7 @@ import {LoginPage} from '../../features/auth/components/Login';
 import App from '../../App';
 import type {JSX} from "react";
 import {AdminDashboard} from "../../features/admin/components/AdminDashboard.tsx";
+import {JoinGroupRoute} from "../../features/polls/components/JoinGroupRoute.tsx";
 
 const PrivateRoute = ({children}: { children: JSX.Element }) => {
     const {user} = useAuth();
@@ -34,6 +35,14 @@ export const AppRoutes = () => {
                     element={
                         <PrivateRoute>
                             <AdminDashboard/>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/join/:inviteCode"
+                    element={
+                        <PrivateRoute>
+                            <JoinGroupRoute />
                         </PrivateRoute>
                     }
                 />
