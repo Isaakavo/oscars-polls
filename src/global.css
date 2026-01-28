@@ -9,16 +9,9 @@ html, body, #root {
 
 /* Scrollbar oscura para Chrome/Safari/Edge */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    display: none;
 }
-::-webkit-scrollbar-track {
-    background: #1f1f1f;
-}
-::-webkit-scrollbar-thumb {
-    background: #d4af37;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #b5952f;
+.element {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
