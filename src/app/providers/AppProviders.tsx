@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider, App as AntApp } from 'antd';
+import {ConfigProvider, App as AntApp, theme} from 'antd';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -16,6 +16,7 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
         <QueryClientProvider client={queryClient}>
             <ConfigProvider
                 theme={{
+                    algorithm: theme.darkAlgorithm,
                     token: {
                         colorPrimary: '#d4af37',
                         borderRadius: 0,
@@ -24,6 +25,13 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
                     components: {
                         Layout: {
                             headerBg: '#000000',
+                        },
+                        Tabs: {
+                            itemColor: '#888888',
+                            itemSelectedColor: '#d4af37',
+                            itemHoverColor: '#ffffff',
+                            inkBarColor: '#d4af37',
+                            titleFontSize: 16
                         }
                     }
                 }}
