@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Form, Input, Button, Card, Typography, message, Layout } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {UserOutlined, LockOutlined, GoogleOutlined} from '@ant-design/icons';
 import { supabase } from '../../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import {CountdownTimer} from "../../../components/ui/CountdownTimer.tsx";
 
 const { Title, Text } = Typography;
 
@@ -10,6 +11,24 @@ export const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
     const navigate = useNavigate();
+
+    const handleGoogleLogin = async () => {
+        try {
+            setLoading(true);
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    // Esto redirige al usuario de vuelta a la app después de autorizar
+                    redirectTo: window.location.origin
+                }
+            });
+            if (error) throw error;
+            // No necesitamos hacer nada más, Supabase redirige solo
+        } catch (error: any) {
+            message.error('Error con Google: ' + error.message);
+            setLoading(false);
+        }
+    };
 
     const onFinish = async (values: any) => {
         setLoading(true);
@@ -48,6 +67,7 @@ export const LoginPage = () => {
             <Card style={{ width: '100%', maxWidth: 400, border: '1px solid #d4af37' }} variant={'borderless'}>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
                     <Title level={2} style={{ color: '#d4af37' }}>Oscars 2026</Title>
+                    <CountdownTimer />
                     <Text type="secondary">Inicia sesión para votar</Text>
                 </div>
 
@@ -85,6 +105,17 @@ export const LoginPage = () => {
                             {isSignUp ? 'Registrarse' : 'Entrar'}
                         </Button>
                     </Form.Item>
+                    <Button
+                        type="default"
+                        size="large"
+                        block
+                        icon={<GoogleOutlined />}
+                        onClick={handleGoogleLogin}
+                        loading={loading}
+                        style={{ marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        Continuar con Google
+                    </Button>
 
                     <div style={{ textAlign: 'center' }}>
                         <Button type="link" onClick={() => setIsSignUp(!isSignUp)}>
