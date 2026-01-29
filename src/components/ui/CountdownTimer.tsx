@@ -9,7 +9,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
     return (
         <div style={{ textAlign: 'center', color: '#fff', lineHeight: 1.2 }}>
             <div style={{ fontSize: 18, fontWeight: 'bold', fontFamily: 'monospace' }}>
-                {days}d {hours}h {minutes}m
+                {days}d {hours}h {minutes}m {seconds}s
             </div>
             <div style={{ fontSize: 10, color: '#666' }}>FALTAN</div>
         </div>
