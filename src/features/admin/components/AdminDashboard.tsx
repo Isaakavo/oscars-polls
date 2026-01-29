@@ -113,6 +113,7 @@ export const AdminDashboard = () => {
                                     onClick={() => {
                                         if (selectedCategory) {
                                             addMutation.mutate({
+                                                id: categories?.flatMap(cat => cat.nominees).find(nom => nom.movie_title === item.title)?.id,
                                                 categoryId: selectedCategory,
                                                 movie: item
                                             });

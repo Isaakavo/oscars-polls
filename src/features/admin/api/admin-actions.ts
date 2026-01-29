@@ -15,21 +15,26 @@ export const markWinner = async (nomineeId: number, categoryId: number) => {
 };
 
 export const addNomineeFromTMDB = async ({
+                                             id,
                                              categoryId,
                                              movie,
                                          }: {
+    id: number | undefined;
     categoryId: number;
     movie: { title: string; poster_path: string };
 }) => {
+    console.log('addNomineeFromTMDB', id);
     const {error} = await supabase
         .from('nominees')
-        .insert({
-            category_id: categoryId,
-            name: movie.title,
-            movie_title: movie.title,
-            poster_path: movie.poster_path,
-            is_winner: false
-        });
+        .upsert({
+                id: id,
+                category_id: categoryId,
+                name: movie.title,
+                movie_title: movie.title,
+                poster_path: movie.poster_path,
+                is_winner: false
+            },
+            {onConflict: 'id'});
 
     if (error) throw new Error(error.message);
 };
