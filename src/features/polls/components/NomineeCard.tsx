@@ -20,31 +20,28 @@ export const NomineeCard = ({nominee, isSelected, onVote}: NomineeCardProps) => 
     return (
         <motion.div
             whileHover={{scale: 1.02}}
-            animate={nominee.is_winner ? {scale: [1, 1.05, 1]} : {}} // Pequeño latido si gana
+            animate={nominee.is_winner ? {scale: [1, 1.05, 1]} : {}}
             transition={{duration: 0.5}}
         >
             <Card
                 hoverable
-                onClick={nominee.is_winner ? undefined : onVote} // Bloquear voto si ya se anunció ganador
+                onClick={nominee.is_winner ? undefined : onVote}
                 style={{
-                    // Si gana: Borde Dorado Brillante. Si seleccioné: Borde Dorado normal.
                     border: nominee.is_winner
                         ? '4px solid #FFD700'
                         : isSelected ? '2px solid #d4af37' : '1px solid #303030',
                     position: 'relative',
                     overflow: 'hidden',
                     backgroundColor: isSelected ? '#1f1f1f' : '#141414',
-                    // Sombra brillante si gana
                     boxShadow: nominee.is_winner ? '0 0 20px rgba(255, 215, 0, 0.4)' : 'none'
                 }}
                 cover={
                     <div style={{position: 'relative'}}>
-                        {/* ... Imagen (igual que antes) ... */}
                         <img
                             alt={nominee.name}
                             src={nominee.poster_path}
                             style={{
-                                height: 320, width: '100%', objectFit: 'cover',
+                                height: 'auto', width: '100%', aspectRatio: '2/3',
                                 opacity: isSelected || nominee.is_winner ? 1 : 0.6,
                                 filter: nominee.is_winner ? 'none' : 'grayscale(20%)' // Resaltar ganador a color
                             }}
