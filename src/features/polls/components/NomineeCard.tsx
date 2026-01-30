@@ -1,8 +1,9 @@
 import {Card} from 'antd';
 import {CheckCircleFilled, CrownFilled} from '@ant-design/icons';
-import {motion} from 'framer-motion'; // Para una animación suave al seleccionar
+import {motion} from 'framer-motion';
+import {NomineeImage} from "./NomineeImage.tsx";
 
-interface NomineeCardProps {
+export interface NomineeCardProps {
     nominee: {
         id: number;
         name: string;
@@ -37,15 +38,7 @@ export const NomineeCard = ({nominee, isSelected, onVote}: NomineeCardProps) => 
                 }}
                 cover={
                     <div style={{position: 'relative'}}>
-                        <img
-                            alt={nominee.name}
-                            src={nominee.poster_path}
-                            style={{
-                                height: 'auto', width: '100%', aspectRatio: '2/3',
-                                opacity: isSelected || nominee.is_winner ? 1 : 0.6,
-                                filter: nominee.is_winner ? 'none' : 'grayscale(20%)' // Resaltar ganador a color
-                            }}
-                        />
+                        <NomineeImage nominee={nominee} isSelected={isSelected} onVote={() => {}} />
 
                         {/* Badge de Ganador Oficial */}
                         {nominee.is_winner && (
