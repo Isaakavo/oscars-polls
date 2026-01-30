@@ -19,6 +19,7 @@ export const LoginPage = () => {
     const handleInviteCode = () => {
         if (!inviteCode) {
             navigate('/');
+            return
         }
 
         navigate(`/join/${inviteCode}`);
