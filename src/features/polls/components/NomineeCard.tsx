@@ -78,7 +78,7 @@ export const NomineeCard = ({nominee, isSelected, onVote}: NomineeCardProps) => 
                             <span style={{color: nominee.is_winner ? '#FFD700' : 'white'}}>{nominee.name}</span>
                         </div>
                     }
-                    description={''}
+                    description={nominee.movie_title}
                 />
             </Card>
         </motion.div>
