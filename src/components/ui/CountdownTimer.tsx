@@ -1,6 +1,6 @@
 import Countdown from 'react-countdown';
 
-const OSCAR_DATE = new Date('2026-03-15T17:00:00-07:00'); // Hora del Pacífico
+const OSCAR_DATE = new Date('2026-03-15T16:00:00-07:00').getTime(); // Hora UTC
 
 const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
     if (completed) {

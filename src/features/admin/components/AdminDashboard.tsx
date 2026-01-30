@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { Table, Button, Tag, Space, Modal, Input, List, message, Avatar } from 'antd';
-import { TrophyOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { useCategories } from '../../polls/hooks/useCategories';
-import { searchMovies } from '../api/tmdb';
-import { markWinner } from '../api/admin-actions';
-import { useQueryClient } from '@tanstack/react-query';
-import { addNomineeFromTMDB } from '../api/admin-actions';
-import { useMutation } from '@tanstack/react-query';
+import {useState} from 'react';
+import {Table, Button, Tag, Space, Modal, Input, List, message, Avatar} from 'antd';
+import {TrophyOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
+import {useCategories} from '../../polls/hooks/useCategories';
+import {searchMovies, searchPeople} from '../api/tmdb';
+import {markWinner} from '../api/admin-actions';
+import {useQueryClient} from '@tanstack/react-query';
+import {addNomineeFromTMDB} from '../api/admin-actions';
+import {useMutation} from '@tanstack/react-query';
+
+const PEOPLE_CATEGORIES = [5, 6, 7, 8, 9, 12, 13, 16, 17, 18, 19, 20];
 
 export const AdminDashboard = () => {
-    const { data: categories } = useCategories();
+    const {data: categories} = useCategories();
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +20,7 @@ export const AdminDashboard = () => {
 
     const handleSearch = async () => {
         try {
-            const results = await searchMovies(searchTerm);
+            const results = await ((selectedCategory && PEOPLE_CATEGORIES.includes(selectedCategory)) ?  searchPeople(searchTerm) : searchMovies(searchTerm));
             setSearchResults(results);
         } catch (e) {
             message.error('Error buscando películas');
@@ -29,7 +31,7 @@ export const AdminDashboard = () => {
         try {
             await markWinner(nomineeId, categoryId);
             message.success('¡Ganador actualizado!');
-            queryClient.invalidateQueries({ queryKey: ['categories'] }); // Refrescar UI
+            queryClient.invalidateQueries({queryKey: ['categories']}); // Refrescar UI
         } catch (e) {
             message.error('Error al actualizar');
         }
@@ -39,14 +41,14 @@ export const AdminDashboard = () => {
         mutationFn: addNomineeFromTMDB,
         onSuccess: () => {
             message.success('Película agregada a la categoría');
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
+            queryClient.invalidateQueries({queryKey: ['categories']});
             setIsModalOpen(false);
         },
         onError: () => message.error('Error al agregar'),
     });
 
     const columns = [
-        { title: 'Categoría', dataIndex: 'name', key: 'name' },
+        {title: 'Categoría', dataIndex: 'name', key: 'name'},
         {
             title: 'Nominados',
             key: 'nominees',
@@ -56,17 +58,17 @@ export const AdminDashboard = () => {
                         <Tag
                             key={nom.id}
                             color={nom.is_winner ? 'gold' : 'default'}
-                            style={{ cursor: 'pointer', padding: 5 }}
+                            style={{cursor: 'pointer', padding: 5}}
                             onClick={() => handleMarkWinner(nom.id, record.id)}
                         >
-                            {nom.is_winner && <TrophyOutlined style={{ marginRight: 5 }} />}
+                            {nom.is_winner && <TrophyOutlined style={{marginRight: 5}}/>}
                             {nom.name}
                         </Tag>
                     ))}
                     <Button
                         type="dashed"
                         size="small"
-                        icon={<PlusOutlined />}
+                        icon={<PlusOutlined/>}
                         onClick={() => {
                             setSelectedCategory(record.id);
                             setIsModalOpen(true);
@@ -80,9 +82,9 @@ export const AdminDashboard = () => {
     ];
 
     return (
-        <div style={{ padding: 24, background: 'white', borderRadius: 8 }}>
+        <div style={{padding: 24, background: 'white', borderRadius: 8}}>
             <h2>Panel de Administración</h2>
-            <Table dataSource={categories} columns={columns} rowKey="id" pagination={false} />
+            <Table dataSource={categories} columns={columns} rowKey="id" pagination={false}/>
 
             {/* Modal para buscar y agregar pelis */}
             <Modal
@@ -91,14 +93,14 @@ export const AdminDashboard = () => {
                 onCancel={() => setIsModalOpen(false)}
                 footer={null}
             >
-                <Space.Compact style={{ width: '100%', marginBottom: 20 }}>
+                <Space.Compact style={{width: '100%', marginBottom: 20}}>
                     <Input
                         placeholder="Ej. Barbie"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onPressEnter={handleSearch}
                     />
-                    <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>Buscar</Button>
+                    <Button type="primary" icon={<SearchOutlined/>} onClick={handleSearch}>Buscar</Button>
                 </Space.Compact>
 
                 <List
@@ -113,7 +115,7 @@ export const AdminDashboard = () => {
                                     onClick={() => {
                                         if (selectedCategory) {
                                             addMutation.mutate({
-                                                id: categories?.flatMap(cat => cat.nominees).find(nom => nom.movie_title === item.title)?.id,
+                                                id: categories?.filter(cat => cat.id === selectedCategory).flatMap(cat => cat.nominees).find(nom => nom.name.toLowerCase() === item.title.toLowerCase())?.id,
                                                 categoryId: selectedCategory,
                                                 movie: item
                                             });
@@ -125,9 +127,9 @@ export const AdminDashboard = () => {
                             ]}
                         >
                             <List.Item.Meta
-                                avatar={<Avatar src={item.poster_path} shape="square" size={64} />}
+                                avatar={<Avatar src={item.poster_path} shape="square" size={64}/>}
                                 title={item.title}
-                                description={item.release_date}
+                                description={item.release_date ?? item.known_for}
                             />
                         </List.Item>
                     )}

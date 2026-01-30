@@ -16,3 +16,19 @@ export const searchMovies = async (query: string) => {
         release_date: movie.release_date
     }));
 };
+
+export const searchPeople = async (query: string) => {
+    if (!query) return [];
+
+    const response = await fetch(`${BASE_URL}/search/person?query=${encodeURIComponent(query)}&api_key=${API_KEY}`)
+    const data = await response.json();
+
+    if(!data.results) return [];
+
+    return data.results.map((person: any) => ({
+        id: person.id,
+        title: person.name,
+        poster_path: person.profile_path ? `https://image.tmdb.org/t/p/w500${person.profile_path}` : null,
+        known_for: person.knonw_for,
+    }));
+}
