@@ -11,7 +11,16 @@ export const JoinGroupRoute = () => {
     const attemptRef = useRef(false); // Evitar doble ejecución en React StrictMode
 
     useEffect(() => {
-        if (!inviteCode || !user || attemptRef.current) return;
+        if (!inviteCode || !user || attemptRef.current) {
+            if (!user) {
+                message.error('Necesitar iniciar sesion para unirte a un grupo')
+                navigate({
+                    pathname: '/login',
+                    search: '?inviteCode=' + inviteCode,
+                })
+            }
+            return;
+        }
 
         const join = async () => {
             attemptRef.current = true;

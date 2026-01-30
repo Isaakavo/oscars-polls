@@ -41,9 +41,7 @@ export const AppRoutes = () => {
                 <Route
                     path="/join/:inviteCode"
                     element={
-                        <PrivateRoute>
-                            <JoinGroupRoute />
-                        </PrivateRoute>
+                        <JoinGroupRoute/>
                     }
                 />
             </Routes>
