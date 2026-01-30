@@ -1,9 +1,10 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Form, Input, Button, Card, Typography, message, Layout} from 'antd';
 import {UserOutlined, LockOutlined, GoogleOutlined} from '@ant-design/icons';
 import {supabase} from '../../../lib/supabase';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {CountdownTimer} from "../../../components/ui/CountdownTimer.tsx";
+import {useAuth} from "../context/AuthContext.tsx";
 
 const {Title, Text} = Typography;
 
@@ -13,6 +14,7 @@ export const LoginPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const inviteCode = searchParams.get('inviteCode');
+    const {user} = useAuth();
 
     const handleInviteCode = () => {
         if (!inviteCode) {
@@ -72,6 +74,12 @@ export const LoginPage = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if(user) {
+            navigate('/')
+        }
+    }, [user, navigate])
 
     return (
         <Layout style={{

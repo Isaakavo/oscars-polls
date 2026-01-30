@@ -1,10 +1,14 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import type {User, Session} from '@supabase/supabase-js';
-import { supabase } from '../../../lib/supabase';
-import { Spin } from 'antd';
+import {supabase} from '../../../lib/supabase';
+import {Spin} from 'antd';
+
+export interface AppUser extends User {
+    isAdmin?: boolean;
+}
 
 interface AuthContextType {
-    user: User | null;
+    user: AppUser | null;
     session: Session | null;
     isLoading: boolean;
     signOut: () => Promise<void>;
@@ -12,24 +16,50 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({children}: { children: React.ReactNode }) => {
+    const [user, setUser] = useState<AppUser | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // 1. Verificar sesión actual al cargar
+        const refreshSession = async (currentSession: Session | null) => {
+            try {
+                if (!currentSession?.user) {
+                    setUser(null);
+                    setSession(null);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const { data } = await supabase
+                    .from('profiles')
+                    .select('is_admin')
+                    .eq('id', currentSession.user.id)
+                    .single();
+
+
+                const appUser: AppUser = {
+                    ...currentSession.user,
+                    isAdmin: data?.is_admin || false,
+                };
+
+                setUser(appUser);
+                setSession(currentSession);
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                setUser(currentSession?.user ?? null);
+                setSession(currentSession);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setIsLoading(false);
+            refreshSession(session);
         });
 
-        // 2. Escuchar cambios (login, logout, refresh token)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setIsLoading(false);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+            refreshSession(newSession);
         });
 
         return () => subscription.unsubscribe();
@@ -41,14 +71,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (isLoading) {
         return (
-            <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#000' }}>
-                <Spin size="large" tip="Verificando credenciales..." />
+            <div style={{
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                background: '#000'
+            }}>
+                <Spin size="large" tip="Verificando credenciales..."/>
             </div>
         );
     }
 
+    console.log({user})
+
     return (
-        <AuthContext.Provider value={{ user, session, isLoading, signOut }}>
+        <AuthContext.Provider value={{user, session, isLoading, signOut}}>
             {children}
         </AuthContext.Provider>
     );

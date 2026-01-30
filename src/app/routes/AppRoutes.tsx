@@ -16,6 +16,19 @@ const PrivateRoute = ({children}: { children: JSX.Element }) => {
     return children;
 };
 
+const AdminRoute = ({children}: { children: JSX.Element }) => {
+    const {user} = useAuth();
+
+    if (!user || !user.email || !user.isAdmin) {
+        if(!user?.isAdmin) {
+            return <Navigate to="/" replace/>;
+        }
+        return <Navigate to="/login" replace/>;
+    }
+
+    return children;
+}
+
 export const AppRoutes = () => {
     return (
         <BrowserRouter>
@@ -33,16 +46,14 @@ export const AppRoutes = () => {
                 <Route
                     path="/admin"
                     element={
-                        <PrivateRoute>
+                        <AdminRoute>
                             <AdminDashboard/>
-                        </PrivateRoute>
+                        </AdminRoute>
                     }
                 />
                 <Route
                     path="/join/:inviteCode"
-                    element={
-                        <JoinGroupRoute/>
-                    }
+                    element={<JoinGroupRoute/>}
                 />
             </Routes>
         </BrowserRouter>
