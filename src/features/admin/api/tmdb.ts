@@ -1,10 +1,7 @@
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
-
 export const searchMovies = async (query: string) => {
     if (!query) return [];
 
-    const response = await fetch(`${BASE_URL}/search/movie?query=${encodeURIComponent(query)}&api_key=${API_KEY}`);
+    const response = await fetch(`/api/tmdb?type=movie&query=${encodeURIComponent(query)}`);
     const data = await response.json();
 
     return data.results.map((movie: any) => ({
@@ -20,15 +17,15 @@ export const searchMovies = async (query: string) => {
 export const searchPeople = async (query: string) => {
     if (!query) return [];
 
-    const response = await fetch(`${BASE_URL}/search/person?query=${encodeURIComponent(query)}&api_key=${API_KEY}`)
+    const response = await fetch(`/api/tmdb?type=person&query=${encodeURIComponent(query)}`);
     const data = await response.json();
 
-    if(!data.results) return [];
+    if (!data.results) return [];
 
     return data.results.map((person: any) => ({
         id: person.id,
         title: person.name,
         poster_path: person.profile_path ? `https://image.tmdb.org/t/p/w500${person.profile_path}` : null,
-        known_for: person.knonw_for,
+        known_for: person.known_for,
     }));
-}
+};
