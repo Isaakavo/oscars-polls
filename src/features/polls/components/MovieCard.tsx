@@ -1,6 +1,6 @@
-import {type FC} from "react";
-import {Col, Collapse, Row, Spin, Alert, List} from "antd";
-import {CheckCircleFilled, LockOutlined} from "@ant-design/icons";
+import {type FC, useEffect, useState} from "react";
+import {Col, Collapse, Row, Spin, Alert, List, FloatButton} from "antd";
+import {CheckCircleFilled, LockOutlined, ArrowRightOutlined, VerticalAlignTopOutlined} from "@ant-design/icons";
 import {NomineeCard} from "./NomineeCard.tsx";
 import {useCategories} from "../hooks/useCategories.ts";
 import {useUserVotes} from "../hooks/useUserVotes.ts";
@@ -28,6 +28,19 @@ export const MovieCard: FC = () => {
         castVote({userId: user.id, categoryId, nomineeId});
     };
 
+    const [showBackTop, setShowBackTop] = useState(false);
+
+    useEffect(() => {
+        const root = document.getElementById('root');
+        const onScroll = () => setShowBackTop((root?.scrollTop ?? 0) > 300);
+        window.addEventListener('scroll', onScroll, true);
+        return () => window.removeEventListener('scroll', onScroll, true);
+    }, []);
+
+    const scrollToCategory = (categoryId: number) => {
+        document.getElementById(`category-${categoryId}`)?.scrollIntoView({behavior: 'smooth'});
+    };
+
     if (loadingCats) {
         return (
             <div style={{textAlign: 'center', marginTop: 50}}>
@@ -38,9 +51,10 @@ export const MovieCard: FC = () => {
 
     const categoriesLeft = categories
         ?.filter(category => category.nominees.every(nominee => !isSelected(category.id, nominee.id)))
-        .map(category => category.name) ?? [];
+        .map(category => ({id: category.id, name: category.name})) ?? [];
 
     return (
+        <>
         <div style={{display: 'flex', flexDirection: 'column', gap: '48px'}}>
             {categoriesLeft.length > 0 && (
                 <Collapse items={[{
@@ -55,7 +69,15 @@ export const MovieCard: FC = () => {
                     children: (
                         <List
                             dataSource={categoriesLeft}
-                            renderItem={(item) => <List.Item>{item}</List.Item>}
+                            renderItem={(item) => (
+                                <List.Item
+                                    onClick={() => scrollToCategory(item.id)}
+                                    style={{cursor: 'pointer', color: '#1668dc', gap: 8}}
+                                >
+                                    <ArrowRightOutlined/>
+                                    {item.name}
+                                </List.Item>
+                            )}
                         />
                     )
                 }]}/>
@@ -70,7 +92,7 @@ export const MovieCard: FC = () => {
                 />
             )}
             {categories?.map((cat) => (
-                <div key={cat.id}>
+                <div key={cat.id} id={`category-${cat.id}`}>
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -103,5 +125,12 @@ export const MovieCard: FC = () => {
                 </div>
             ))}
         </div>
+        {showBackTop && (
+            <FloatButton
+                icon={<VerticalAlignTopOutlined/>}
+                onClick={() => document.getElementById('root')?.scrollTo({top: 0, behavior: 'smooth'})}
+            />
+        )}
+</>
     )
 }
