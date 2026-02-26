@@ -1,19 +1,29 @@
 import {useState} from 'react';
-import {Table, Button, Tag, Space, Modal, Input, List, message, Avatar} from 'antd';
-import {TrophyOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
+import {Table, Button, Tag, Space, Modal, Input, List, message, Avatar, Switch} from 'antd';
+import {TrophyOutlined, PlusOutlined, SearchOutlined, LockOutlined, UnlockOutlined} from '@ant-design/icons';
 import {useCategories} from '../../polls/hooks/useCategories';
 import {searchMovies, searchPeople} from '../api/tmdb';
-import {markWinner} from '../api/admin-actions';
-import {useQueryClient} from '@tanstack/react-query';
+import {markWinner, setVotingClosed} from '../api/admin-actions';
+import {useQueryClient, useMutation} from '@tanstack/react-query';
 import {addNomineeFromTMDB} from '../api/admin-actions';
-import {useMutation} from '@tanstack/react-query';
+import {useVotingStatus} from '../../polls/hooks/useVotingStatus';
 
 const PEOPLE_CATEGORIES = [5, 6, 7, 8, 9, 12, 13, 16, 17, 18, 19, 20];
 
 export const AdminDashboard = () => {
     const {data: categories} = useCategories();
+    const {data: votingClosed} = useVotingStatus();
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const votingMutation = useMutation({
+        mutationFn: setVotingClosed,
+        onSuccess: (_, closed) => {
+            message.success(closed ? 'Votación cerrada' : 'Votación abierta');
+            queryClient.invalidateQueries({queryKey: ['voting_status']});
+        },
+        onError: () => message.error('Error al cambiar el estado de la votación'),
+    });
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -82,8 +92,21 @@ export const AdminDashboard = () => {
     ];
 
     return (
-        <div style={{padding: 24, background: 'white', borderRadius: 8}}>
-            <h2>Panel de Administración</h2>
+        <div style={{padding: 24, background: '#141414', borderRadius: 8}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
+                <h2 style={{margin: 0}}>Panel de Administración</h2>
+                <Space>
+                    {votingClosed ? <LockOutlined style={{color: 'red'}}/> : <UnlockOutlined style={{color: 'green'}}/>}
+                    <span>{votingClosed ? 'Votación cerrada' : 'Votación abierta'}</span>
+                    <Switch
+                        checked={votingClosed}
+                        loading={votingMutation.isPending}
+                        onChange={(closed) => votingMutation.mutate(closed)}
+                        checkedChildren="Cerrada"
+                        unCheckedChildren="Abierta"
+                    />
+                </Space>
+            </div>
             <Table dataSource={categories} columns={columns} rowKey="id" pagination={false}/>
 
             {/* Modal para buscar y agregar pelis */}

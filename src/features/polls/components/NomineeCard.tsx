@@ -12,22 +12,25 @@ export interface NomineeCardProps {
         is_winner: boolean;
     };
     isSelected: boolean;
+    votingClosed: boolean;
     onVote: () => void;
 }
 
-export const NomineeCard = ({nominee, isSelected, onVote}: NomineeCardProps) => {
+export const NomineeCard = ({nominee, isSelected, votingClosed, onVote}: NomineeCardProps) => {
     const isCorrectGuess = isSelected && nominee.is_winner;
+    const isDisabled = votingClosed || nominee.is_winner;
 
     return (
         <motion.div
-            whileHover={{scale: 1.02}}
+            whileHover={isDisabled ? {} : {scale: 1.02}}
             animate={nominee.is_winner ? {scale: [1, 1.05, 1]} : {}}
             transition={{duration: 0.5}}
         >
             <Card
-                hoverable
-                onClick={nominee.is_winner ? undefined : onVote}
+                hoverable={!isDisabled}
+                onClick={isDisabled ? undefined : onVote}
                 style={{
+                    cursor: isDisabled && !nominee.is_winner ? 'not-allowed' : undefined,
                     border: nominee.is_winner
                         ? '4px solid #FFD700'
                         : isSelected ? '2px solid #d4af37' : '1px solid #303030',
@@ -38,7 +41,8 @@ export const NomineeCard = ({nominee, isSelected, onVote}: NomineeCardProps) => 
                 }}
                 cover={
                     <div style={{position: 'relative'}}>
-                        <NomineeImage nominee={nominee} isSelected={isSelected} onVote={() => {}} />
+                        <NomineeImage nominee={nominee} isSelected={isSelected} votingClosed={votingClosed}
+                                      onVote={() => {}} />
 
                         {/* Badge de Ganador Oficial */}
                         {nominee.is_winner && (

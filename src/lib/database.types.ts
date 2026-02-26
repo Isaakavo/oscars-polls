@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          id: boolean
+          voting_closed: boolean
+        }
+        Insert: {
+          id?: boolean
+          voting_closed?: boolean
+        }
+        Update: {
+          id?: boolean
+          voting_closed?: boolean
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
