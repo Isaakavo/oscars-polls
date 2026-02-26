@@ -39,7 +39,7 @@ export const LiveDashboard = () => {
                         }}>
                             {category.nominees.map((nominee) => {
                                 const voters = getVotersForNominee(nominee.id);
-                                const isPopular = voters.length > 2; // Ejemplo de lógica visual
+                                const isPopular = voters.length > 2;
 
                                 return (
                                     <Card
@@ -53,7 +53,7 @@ export const LiveDashboard = () => {
                                         }}
                                         bodyStyle={{padding: 12}}
                                         cover={
-                                            <NomineeImage nominee={nominee} isSelected={false} onVote={() => {}} />
+                                            <NomineeImage nominee={nominee} isSelected={false} votingClosed={false} onVote={() => {}} />
                                         }
                                     >
                                         <div style={{marginBottom: 12, textAlign: 'center'}}>

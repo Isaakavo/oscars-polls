@@ -29,8 +29,8 @@ export const NomineeCard = ({nominee, isSelected, votingClosed, onVote}: Nominee
             <Card
                 hoverable={!isDisabled}
                 onClick={isDisabled ? undefined : onVote}
-                style={{cursor: isDisabled && !nominee.is_winner ? 'not-allowed' : undefined}}
                 style={{
+                    cursor: isDisabled && !nominee.is_winner ? 'not-allowed' : undefined,
                     border: nominee.is_winner
                         ? '4px solid #FFD700'
                         : isSelected ? '2px solid #d4af37' : '1px solid #303030',
@@ -41,7 +41,8 @@ export const NomineeCard = ({nominee, isSelected, votingClosed, onVote}: Nominee
                 }}
                 cover={
                     <div style={{position: 'relative'}}>
-                        <NomineeImage nominee={nominee} isSelected={isSelected} onVote={() => {}} />
+                        <NomineeImage nominee={nominee} isSelected={isSelected} votingClosed={votingClosed}
+                                      onVote={() => {}} />
 
                         {/* Badge de Ganador Oficial */}
                         {nominee.is_winner && (
