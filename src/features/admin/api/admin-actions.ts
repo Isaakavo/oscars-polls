@@ -1,5 +1,14 @@
 import {supabase} from '../../../lib/supabase';
 
+export const setVotingClosed = async (closed: boolean) => {
+    const {error} = await supabase
+        .from('app_settings')
+        .update({voting_closed: closed})
+        .eq('id', true);
+
+    if (error) throw new Error(error.message);
+};
+
 export const markWinner = async (nomineeId: number, categoryId: number) => {
     await supabase
         .from('nominees')
