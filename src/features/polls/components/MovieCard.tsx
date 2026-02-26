@@ -1,6 +1,6 @@
 import {type FC} from "react";
 import {Col, Collapse, Row, Spin, Alert, List} from "antd";
-import {LockOutlined} from "@ant-design/icons";
+import {CheckCircleFilled, LockOutlined} from "@ant-design/icons";
 import {NomineeCard} from "./NomineeCard.tsx";
 import {useCategories} from "../hooks/useCategories.ts";
 import {useUserVotes} from "../hooks/useUserVotes.ts";
@@ -15,6 +15,12 @@ export const MovieCard: FC = () => {
 
     const isSelected = (categoryId: number, nomineeId: number) => {
         return votes?.some((v: any) => v.category_id === categoryId && v.nominee_id === nomineeId);
+    };
+
+    const hasVoted = (categoryId: number) => {
+        return categories
+            ?.find(cat => cat.id === categoryId)
+            ?.nominees.some(nominee => isSelected(categoryId, nominee.id));
     };
 
     const handleVote = (categoryId: number, nomineeId: number) => {
@@ -33,25 +39,6 @@ export const MovieCard: FC = () => {
     const categoriesLeft = categories
         ?.filter(category => category.nominees.every(nominee => !isSelected(category.id, nominee.id)))
         .map(category => category.name) ?? [];
-
-    const categoriesItems = categories?.map((cat, index) => ({
-        key: index,
-        label: cat.name,
-        children: (
-            <Row gutter={[24, 24]}>
-                {cat.nominees.map((nominee) => (
-                    <Col key={nominee.id} xs={12} sm={8} md={6}>
-                        <NomineeCard
-                            nominee={nominee}
-                            isSelected={isSelected(cat.id, nominee.id) || false}
-                            votingClosed={votingClosed}
-                            onVote={() => handleVote(cat.id, nominee.id)}
-                        />
-                    </Col>
-                ))}
-            </Row>
-        )
-    }))
 
     return (
         <div style={{display: 'flex', flexDirection: 'column', gap: '48px'}}>
@@ -82,7 +69,39 @@ export const MovieCard: FC = () => {
                     showIcon
                 />
             )}
-            <Collapse items={categoriesItems}/>
+            {categories?.map((cat) => (
+                <div key={cat.id}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px 16px',
+                        marginBottom: 16,
+                        background: '#1a1a1a',
+                        borderLeft: '4px solid #d4af37',
+                        borderRadius: '0 4px 4px 0',
+                    }}>
+                        <span style={{color: '#fff', fontWeight: 600, fontSize: 16}}>
+                            {cat.name}
+                        </span>
+                        {hasVoted(cat.id) && (
+                            <CheckCircleFilled style={{color: '#52c41a', fontSize: 18}}/>
+                        )}
+                    </div>
+                    <Row gutter={[24, 24]}>
+                        {cat.nominees.map((nominee) => (
+                            <Col key={nominee.id} xs={12} sm={8} md={6}>
+                                <NomineeCard
+                                    nominee={nominee}
+                                    isSelected={isSelected(cat.id, nominee.id) || false}
+                                    votingClosed={votingClosed}
+                                    onVote={() => handleVote(cat.id, nominee.id)}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+            ))}
         </div>
     )
 }
