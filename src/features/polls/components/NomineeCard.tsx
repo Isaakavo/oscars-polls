@@ -6,8 +6,8 @@ import {NomineeImage} from "./NomineeImage.tsx";
 export interface Voter {
     user_id: string;
     profiles?: {
-        full_name?: string;
-        avatar_url?: string;
+        full_name?: string | null;
+        avatar_url?: string | null;
     };
 }
 
