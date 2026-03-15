@@ -1,7 +1,15 @@
-import {Card} from 'antd';
-import {CheckCircleFilled, CrownFilled} from '@ant-design/icons';
-import {motion} from 'framer-motion';
+import {Avatar, Card, Tooltip} from 'antd';
+import {CheckCircleFilled, CrownFilled, UserOutlined} from '@ant-design/icons';
+import {motion, AnimatePresence} from 'framer-motion';
 import {NomineeImage} from "./NomineeImage.tsx";
+
+export interface Voter {
+    user_id: string;
+    profiles?: {
+        full_name?: string;
+        avatar_url?: string;
+    };
+}
 
 export interface NomineeCardProps {
     nominee: {
@@ -14,9 +22,10 @@ export interface NomineeCardProps {
     isSelected: boolean;
     votingClosed: boolean;
     onVote: () => void;
+    voters?: Voter[];
 }
 
-export const NomineeCard = ({nominee, isSelected, votingClosed, onVote}: NomineeCardProps) => {
+export const NomineeCard = ({nominee, isSelected, votingClosed, onVote, voters}: NomineeCardProps) => {
     const isCorrectGuess = isSelected && nominee.is_winner;
     const isDisabled = votingClosed || nominee.is_winner;
 
@@ -84,6 +93,44 @@ export const NomineeCard = ({nominee, isSelected, votingClosed, onVote}: Nominee
                     }
                     description={nominee.movie_title}
                 />
+
+                {voters !== undefined && (
+                    <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 4,
+                        justifyContent: 'center',
+                        minHeight: 50,
+                        marginTop: 8,
+                    }}>
+                        <div style={{width: '100%', textAlign: 'center', fontSize: 12, color: 'gray', marginBottom: 4}}>
+                            {voters.length} votos
+                        </div>
+                        <AnimatePresence>
+                            {voters.map((vote) => (
+                                <motion.div
+                                    key={vote.user_id}
+                                    initial={{scale: 0}}
+                                    animate={{scale: 1}}
+                                    exit={{scale: 0}}
+                                >
+                                    <Tooltip title={vote.profiles?.full_name || 'Usuario'}>
+                                        <Avatar
+                                            src={vote.profiles?.avatar_url}
+                                            icon={<UserOutlined/>}
+                                            style={{
+                                                backgroundColor: '#d4af37',
+                                                cursor: 'pointer',
+                                                border: '1px solid black'
+                                            }}
+                                            size="small"
+                                        />
+                                    </Tooltip>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                )}
             </Card>
         </motion.div>
     );
